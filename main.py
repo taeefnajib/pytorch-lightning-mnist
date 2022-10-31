@@ -2,6 +2,7 @@
 
 ### Import all dependencies
 import os
+from typing import Dict, List
 import pandas as pd
 import seaborn as sn
 import torch
@@ -20,20 +21,25 @@ from dataclasses import dataclass
 @dataclass
 class Hyperparameters(object):
     """
-    
+    hidden_size
+    learning_rate
+    norm1
+    norm2
     """
-    hidden_size=64
-    learning_rate = 2e-4
-    PATH_DATASETS = os.environ.get("PATH_DATASETS", ".")
-    BATCH_SIZE = 256 if torch.cuda.is_available() else 64
-    norm1 = 0.1307
-    norm2 = 0.3081
+    hidden_size: int = 64
+    learning_rate: float = 2e-4
+    norm1: float = 0.1307
+    norm2: float = 0.3081
     
-
+### Instantiating Hyperparameters class
 hp = Hyperparameters()
 
+PATH_DATASETS = os.environ.get("PATH_DATASETS", ".")
+BATCH_SIZE = 256 if torch.cuda.is_available() else 64
+
+### Defining LitMNIST class
 class LitMNIST(LightningModule):
-    def __init__(self, data_dir=hp.PATH_DATASETS,
+    def __init__(self, data_dir=PATH_DATASETS,
                  hidden_size=hp.hidden_size,
                  learning_rate=hp.learning_rate,
                  norm1 = hp.norm1,
@@ -124,30 +130,29 @@ class LitMNIST(LightningModule):
             self.mnist_test = MNIST(self.data_dir, train=False, transform=self.transform)
 
     def train_dataloader(self):
-        return DataLoader(self.mnist_train, batch_size=hp.BATCH_SIZE)
+        return DataLoader(self.mnist_train, batch_size=BATCH_SIZE)
 
     def val_dataloader(self):
-        return DataLoader(self.mnist_val, batch_size=hp.BATCH_SIZE)
+        return DataLoader(self.mnist_val, batch_size=BATCH_SIZE)
 
     def test_dataloader(self):
-        return DataLoader(self.mnist_test, batch_size=hp.BATCH_SIZE)
+        return DataLoader(self.mnist_test, batch_size=BATCH_SIZE)
 
 model = LitMNIST()
 
 ### Training model
-def train_model(model):
+def train_model(model: LightningModule) -> Trainer:
     trainer = Trainer(accelerator="auto",
                       devices=1 if torch.cuda.is_available() else None, 
                       max_epochs=3, callbacks=[TQDMProgressBar(refresh_rate=20)], 
-                      logger=CSVLogger(save_dir="logs/"),)
-                      
+                      logger=CSVLogger(save_dir="logs/"),)        
     trainer.fit(model)
     return trainer
 
 trainer = train_model(model)
 
 ### Testing model
-def test_model(trainer, model):
+def test_model(trainer: Trainer, model: LightningModule) -> List[Dict[str,float]]:
     return trainer.test(model)
 
 test_model(trainer, model)
