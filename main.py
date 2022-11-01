@@ -155,4 +155,5 @@ trainer = train_model(model)
 def test_model(trainer: Trainer, model: LightningModule) -> List[Dict[str,float]]:
     return trainer.test(model)
 
-test_model(trainer, model)
+if __name__=="__main__":
+    test_model(trainer, model)
