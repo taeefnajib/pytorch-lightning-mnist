@@ -1,8 +1,7 @@
 pandas 
-ipython[notebook] 
 torchvision 
-setuptools==59.5.0 
-torch>=1.8 
-torchmetrics>=0.7
-seaborn 
-pytorch-lightning>=1.4
+setuptools
+torch
+torchmetrics
+pytorch-lightning
+dataclasses_json

@@ -1,5 +1,3 @@
-### !pip install --quiet "pandas" "ipython[notebook]" "torchvision" "setuptools==59.5.0" "torch>=1.8" "torchmetrics>=0.7" "seaborn" "pytorch-lightning>=1.4"
-
 ### Import all dependencies
 import os
 from typing import Dict, List
@@ -17,7 +15,9 @@ from torchmetrics import Accuracy
 from torchvision import transforms
 from torchvision.datasets import MNIST
 from dataclasses import dataclass
+from dataclasses_json import dataclass_json
 
+@dataclass_json
 @dataclass
 class Hyperparameters(object):
     """
